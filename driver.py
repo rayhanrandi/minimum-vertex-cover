@@ -16,6 +16,7 @@ def process_memory() -> int:
     '''
     evaluates memory usage in MB
     '''
+
     process = psutil.Process(os.getpid())
     mem_info = process.memory_info()
     return mem_info.rss / (1024 ** 2)   # bytes to MB
@@ -35,24 +36,22 @@ def vertex_cover_dp(adj_list: dict, N: int) -> set:
     dp = DynamicProgramming()
     
     time_start = time.perf_counter()
-    mem_start = process_memory()
 
-    vc = dp.solve(adj_list, N)
+    vc, mem_usage = dp.solve(adj_list, N)
 
-    mem_end = process_memory()
     time_end = time.perf_counter()
 
     elapsed = (time_end - time_start) * 1000  # to ms
-    mem_usage = mem_end - mem_start
 
     return vc, elapsed, mem_usage
 
 
-def vertex_cover_bnb(adj_list: dict, N: int) -> set:
+def vertex_cover_bnb(adj_list: dict, N: int, cutoff_time: int) -> set:
     '''
     Run branch and bound solution for vertex cover,
     only calculating either 100, 300, or 900 tree nodes.
     '''
+
     G = nx.from_dict_of_lists(adj_list)
 
     subgraph = {
@@ -64,19 +63,18 @@ def vertex_cover_bnb(adj_list: dict, N: int) -> set:
     nodes = [i for i in range(1, subgraph[N] + 1)]
     subtree = G.subgraph(nodes)
 
-    viz = Visualizer()
-    pos = viz.hierarchy_pos(G, 1)
-    nx.draw(subtree, pos, with_labels=True)
-    plt.show()
+    '''Uncomment to visualize calculated subgraph'''
+    # viz = Visualizer()
+    # pos = viz.hierarchy_pos(G, 1)
+    # nx.draw(subtree, pos, with_labels=True)
+    # plt.show()
 
     bnb = BranchAndBound()
 
     time_start = time.perf_counter()
-    mem_start = process_memory()
 
-    vc = bnb.solve(subtree)
+    vc, times, cutoff, mem_usage = bnb.solve(subtree, cutoff_time)
 
-    mem_end = process_memory()
     time_end = time.perf_counter()
 
     for element in vc:
@@ -84,9 +82,8 @@ def vertex_cover_bnb(adj_list: dict, N: int) -> set:
             vc.remove(element)
 
     elapsed = (time_end - time_start) * 1000  # to ms
-    mem_usage = mem_end - mem_start
 
-    return len(vc), elapsed, mem_usage
+    return len(vc), elapsed, mem_usage, cutoff
     
 
 def main():
@@ -98,17 +95,23 @@ def main():
         'large': 10 ** 6
     }
 
+    BNB_CUTOFF_TIME = 600
+
     # leave parameter empty for default generator values (10^4, 10^5, 10^5)
     generator = Generator(N['small'], N['medium'], N['large'])
-    
-    dataset = generator.generate()
 
 
     print('''
         Rayhan Putra Randi
         2106705644 - DAA A - 1
           ''')
+    
 
+    print('Generating dataset...')
+    
+    dataset = generator.generate()
+
+    print('Dataset generated.\n')
 
     for size in dataset:
 
@@ -138,26 +141,33 @@ def main():
             print(dp_write_mem, end='')
             f.write(dp_write_mem)
 
-
-            # header_bnb = f'[BnB] Solving for size {size} ({N[size]})...'
+            header_bnb = f'[BnB] Solving for size {size} ({N[size]}) (subgraph only, cutoff time {BNB_CUTOFF_TIME}s)...\n'
             
-            # print(header_bnb)
-            # f.write(header_bnb)
+            print(header_bnb, end='')
+            f.write(header_bnb)
 
-            # bnb_result, bnb_time, bnb_write_mem = vertex_cover_bnb(adj_list, len(adj_list))
+            bnb_result, bnb_time, bnb_mem, cutoff = vertex_cover_bnb(adj_list, len(adj_list), BNB_CUTOFF_TIME)
 
-            # bnb_write_result = f'[BnB] Total minimum vertex cover: {bnb_result}'
-            # bnb_write_time = f'[BnB] Elapsed time: {bnb_time:.2f} ms.'
-            # bnb_write_mem = f'[BnB] Memory usage: {bnb_mem} MB.\n\n'
+            bnb_write_result = f'[BnB] Total minimum vertex cover: {bnb_result}\n'
+            bnb_write_time = f'[BnB] Elapsed time: {bnb_time:.2f} ms.\n'
+            bnb_write_mem = f'[BnB] Memory usage: {bnb_mem} MB.\n'
 
-            # print(bnb_write_result)
-            # f.write(bnb_write_result)
+            print(bnb_write_result, end='')
+            f.write(bnb_write_result)
 
-            # print(bnb_write_time)
-            # f.write(bnb_write_time)
+            print(bnb_write_time, end='')
+            f.write(bnb_write_time)
 
-            # print(bnb_write_mem, end='')
-            # f.write(bnb_write_mem)
+            print(bnb_write_mem, end='')
+            f.write(bnb_write_mem)
+
+            if cutoff:
+                bnb_write_cutoff = '[BnB] CUTOFF TIME REACHED\n\n'
+                print(bnb_write_cutoff)
+                f.write(bnb_write_cutoff + '\n\n')
+            else:
+                print('\n')
+                f.write('\n\n')
 
             '''Uncomment to visualize full tree'''
             # print("Adjacency List:")
@@ -167,13 +177,14 @@ def main():
             # pos = viz.hierarchy_pos(G, 1)
             # nx.draw(G, pos, with_labels=True)
             # plt.show()
+    
+    print('''
+          Done.
+          Results exported to ./output/
+          ''')
         
 
 
 if __name__ == '__main__':
 
     main()
-
-
-
-

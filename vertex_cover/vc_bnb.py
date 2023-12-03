@@ -50,14 +50,28 @@ When Frontier Set==empty, the whole graph and all possible solutions have been e
 End
 """
 
+import os
 import time
 import operator
 
+import psutil
 
 class BranchAndBound:
 	
     # BRANCH AND BOUND FUNCTION to find minimum VC of a graph
-    def solve(self, G):
+    def solve(self, G, T: int) -> tuple[int, int, bool, int]:
+
+        # RECORD START TIME
+        start_time=time.time()
+        end_time=start_time
+        delta_time=end_time-start_time
+        times=[]    #list of times when solution is found, tuple=(VC size,delta_time)
+
+        # cutoff flag
+        cutoff = False
+
+        # RECORD MEMORY USAGE
+        mem_start = self.process_memory()
 
         # INITIALIZE SOLUTION VC SETS AND FRONTIER SET TO EMPTY SET
         OptVC = []
@@ -67,7 +81,7 @@ class BranchAndBound:
 
         # ESTABLISH INITIAL UPPER BOUND
         UpperBound = G.number_of_nodes()
-        print('Initial UpperBound:', UpperBound)
+        # print('Initial UpperBound:', UpperBound)
 
         CurG = G.copy()  # make a copy of G
         # sort dictionary of degree of nodes to find node with highest degree
@@ -79,7 +93,7 @@ class BranchAndBound:
         Frontier.append((v[0], 1, (-1, -1)))
         # print(Frontier)
 
-        while Frontier!=[]:
+        while Frontier!=[] and delta_time<T:
             (vi,state,parent)=Frontier.pop() #set current node to last element in Frontier
             
             #print('New Iteration(vi,state,parent):', vi, state, parent)
@@ -114,9 +128,10 @@ class BranchAndBound:
                 if CurVC_size < UpperBound:
                     OptVC = CurVC.copy()
                     #print('OPTIMUM:', OptVC)
-                    print('Current Opt VC size', CurVC_size)
+                    # print('Current Opt VC size', CurVC_size)
                     UpperBound = CurVC_size
                     #print('New VC:',OptVC)
+                    times.append((CurVC_size,time.time()-start_time))
                 backtrack = True
                 #print('First backtrack-vertex-',vi)
                     
@@ -166,8 +181,18 @@ class BranchAndBound:
                         CurG = G.copy()
                     else:
                         print('error in backtracking step')
+                    
+            end_time=time.time()
+            delta_time=end_time-start_time
+            
+            if delta_time>T:
+                cutoff = True
+                print('Cutoff time reached')
+        
+        mem_end = self.process_memory()
+        mem_usage = mem_end - mem_start
 
-        return OptVC
+        return OptVC, times, cutoff, mem_usage
     
     #TO FIND THE VERTEX WITH MAXIMUM DEGREE IN REMAINING GRAPH
     def find_maxdeg(self, g):
@@ -182,7 +207,6 @@ class BranchAndBound:
         lb = self.ceil(lb)
         return lb
 
-
     def ceil(self, d):
         """
         return the minimum integer that is bigger than d
@@ -191,7 +215,6 @@ class BranchAndBound:
             return int(d) + 1
         else:
             return int(d)
-        
 
     #CALCULATE SIZE OF VERTEX COVER (NUMBER OF NODES WITH STATE=1)
     def vc_size(self, VC):
@@ -200,3 +223,12 @@ class BranchAndBound:
         for element in VC:
             vc_size = vc_size + element[1]
         return vc_size
+    
+    def process_memory(self) -> int:
+        '''
+        evaluates memory usage in MB
+        '''
+
+        process = psutil.Process(os.getpid())
+        mem_info = process.memory_info()
+        return mem_info.rss / (1024 ** 2)   # bytes to MB
