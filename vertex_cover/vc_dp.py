@@ -1,6 +1,6 @@
 class DynamicProgramming:
 
-    def solve_n_ary_tree(self, adj, N):
+    def solve(self, adj, N):
         dp = [[0 for j in range(2)] for i in range(N+1)]
         for i in range(1, N+1):
             # 0 denotes not included in vertex cover

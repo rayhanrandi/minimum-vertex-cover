@@ -1,4 +1,3 @@
 matplotlib
 networkx
-scipy
-pydot
+psutil

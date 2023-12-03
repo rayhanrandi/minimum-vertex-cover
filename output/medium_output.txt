@@ -1,0 +1,5 @@
+[DP] Solving for size medium (100000)...
+[DP] Total minimum vertex cover: 40341
+[DP] Elapsed time: 87.44 ms.
+[DP] Memory usage: 0.84765625 MB.
+
