@@ -1,0 +1,14 @@
+[DP] Solving for size small (10000)...
+[DP] Done.
+[DP] Total minimum vertex cover: 4019
+[DP] Elapsed time: 6.41 ms.
+[DP] Memory usage: 0.40234375 MB.
+
+[BnB] Solving for size small (10000) (subgraph only, cutoff time 600s)...
+[BnB] Done.
+[BnB] Total minimum vertex cover: 40
+[BnB] Elapsed time for found vertex cover: 75.39 ms.
+[BnB] Total elapsed time: 4628.28 ms.
+[BnB] Memory usage: 0.0703125 MB.
+
+
