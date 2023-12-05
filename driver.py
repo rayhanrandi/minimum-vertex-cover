@@ -82,8 +82,9 @@ def vertex_cover_bnb(adj_list: dict, N: int, cutoff_time: int) -> set:
             vc.remove(element)
 
     elapsed = (time_end - time_start) * 1000  # to ms
+    print(f'[BnB] Times for solutions: {times}')
 
-    return len(vc), elapsed, mem_usage, cutoff
+    return len(vc), elapsed, mem_usage, cutoff, times
     
 
 def main():
@@ -113,6 +114,13 @@ def main():
 
     print('Dataset generated.\n')
 
+    print(f'''
+          Solving for sizes:
+          Small : {N['small']}
+          Medium: {N['medium']}
+          Large : {N['large']}
+          ''')
+
     for size in dataset:
 
         filename = f'{size}_output.txt'
@@ -127,6 +135,9 @@ def main():
             f.write(header_dp)
 
             dp_result, dp_time, dp_mem = vertex_cover_dp(adj_list, len(adj_list))
+
+            print('[DP] Done.')
+            f.write('[DP] Done.\n')
 
             dp_write_result = f'[DP] Total minimum vertex cover: {dp_result}\n'
             dp_write_time = f'[DP] Elapsed time: {dp_time:.2f} ms.\n'
@@ -146,11 +157,25 @@ def main():
             print(header_bnb, end='')
             f.write(header_bnb)
 
-            bnb_result, bnb_time, bnb_mem, cutoff = vertex_cover_bnb(adj_list, len(adj_list), BNB_CUTOFF_TIME)
+            bnb_result, bnb_time, bnb_mem, cutoff, times = vertex_cover_bnb(adj_list, len(adj_list), BNB_CUTOFF_TIME)
 
-            bnb_write_result = f'[BnB] Total minimum vertex cover: {bnb_result}\n'
-            bnb_write_time = f'[BnB] Elapsed time: {bnb_time:.2f} ms.\n'
+            print('[BnB] Done.')
+            f.write('[BnB] Done.\n')
+
+            if cutoff:
+                bnb_write_cutoff = '[BnB] CUTOFF TIME REACHED'
+                print(bnb_write_cutoff, end='\n')
+                f.write(bnb_write_cutoff + '\n')
+
+                bnb_write_result = f'[BnB] Found vertex cover: {bnb_result}\n'
+                
+            else:
+                bnb_write_result = f'[BnB] Total minimum vertex cover: {bnb_result}\n'
+
+            bnb_write_time = f'[BnB] Elapsed time for found vertex cover: {(times[-1][-1] * 1000):.2f} ms.\n'  # to ms
+            bnb_write_total_time = f'[BnB] Total elapsed time: {bnb_time:.2f} ms.\n'
             bnb_write_mem = f'[BnB] Memory usage: {bnb_mem} MB.\n'
+
 
             print(bnb_write_result, end='')
             f.write(bnb_write_result)
@@ -158,18 +183,20 @@ def main():
             print(bnb_write_time, end='')
             f.write(bnb_write_time)
 
+            print(bnb_write_total_time, end='')
+            f.write(bnb_write_total_time)
+
             print(bnb_write_mem, end='')
             f.write(bnb_write_mem)
 
-            if cutoff:
-                bnb_write_cutoff = '[BnB] CUTOFF TIME REACHED\n\n'
-                print(bnb_write_cutoff)
-                f.write(bnb_write_cutoff + '\n\n')
-            else:
-                print('\n')
-                f.write('\n\n')
+            print('\n')
+            f.write('\n\n')
 
-            '''Uncomment to visualize full tree'''
+            '''
+            Uncomment to visualize full tree
+            '''
+            # G = nx.from_dict_of_lists(adj_list)
+
             # print("Adjacency List:")
             # print(adj_list)
 
