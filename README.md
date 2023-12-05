@@ -1,6 +1,6 @@
 # Minimum Vertex Cover (MVC) Problem: <br> Dynamic Programming vs Branch & Bound
 
-- `driver.py` : Executes both sorting algorithms, prints running time and memory usage for each datasets/sorting algorithm.
+- `driver.py` : Executes both MVC algorithms, prints running time and memory usage for each datasets/algorithm.
 - `./vertex_cover` : Implementation of Dynamic Programming and Branch & Bound algorithm for MVC.
 - `./utils/dataset.py` : Generates random datasets for comparison.
 - `./utils/visualizer.py` : Visualizer for generated datasets.
