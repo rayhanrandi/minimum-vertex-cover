@@ -195,7 +195,7 @@ class BranchAndBound:
         lb = self.ceil(lb)
         return lb
 
-    def ceil(self, d):
+    def ceil(self, d: int) -> int:
         '''
         return the minimum integer that is bigger than d
         ''' 
@@ -204,7 +204,7 @@ class BranchAndBound:
         else:
             return int(d)
 
-    def vc_size(self, VC):
+    def vc_size(self, VC: list) -> int:
         '''
         Calculate size of vertex cover (number of nodes with state = 1)
         VC  : a tuple list, where each tuple = (node_ID, state, (node_ID, state)) vc_size is the number of nodes which has state == 1

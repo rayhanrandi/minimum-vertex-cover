@@ -4,8 +4,11 @@ import psutil
 
 
 class DynamicProgramming:
+    '''
+    Dynamic programming class with solver to find minimum vertex cover of tree graph
+    '''
 
-    def solve(self, adj: list, N: int) -> tuple[int, int]:
+    def solve(self, adj: list[list[int]], N: int) -> tuple[int, int]:
         mem_start = self.process_memory()
 
         dp = [[0 for j in range(2)] for i in range(N+1)]
@@ -24,7 +27,7 @@ class DynamicProgramming:
         # return minimum size vertex cover
         return min(dp[1][0], dp[1][1]), mem_usage
     
-    def dfs(self, adj: list, dp: list, src: int, par: int) -> None:
+    def dfs(self, adj: list[list[int]], dp: list[list[int]], src: int, par: int) -> None:
         for child in adj[src]:
             if child != par:
                 self.dfs(adj, dp, child, src)

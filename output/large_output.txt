@@ -1,12 +1,15 @@
 [DP] Solving for size large (1000000)...
-[DP] Total minimum vertex cover: 403604
-[DP] Elapsed time: 1460.62 ms.
-[DP] Memory usage: 96.4921875 MB.
+[DP] Done.
+[DP] Total minimum vertex cover: 403578
+[DP] Elapsed time: 1425.13 ms.
+[DP] Memory usage: 95.5625 MB.
 
 [BnB] Solving for size large (1000000) (subgraph only, cutoff time 600s)...
+[BnB] Done.
 [BnB] CUTOFF TIME REACHED
-[BnB] Found vertex cover: 371
-[BnB] Elapsed time for found vertex cover: 124.35 ms.
-[BnB] Memory usage: 0.30078125 MB.
+[BnB] Found vertex cover: 369
+[BnB] Elapsed time for found vertex cover: 120.06 ms.
+[BnB] Total elapsed time: 600000.07 ms.
+[BnB] Memory usage: 0.2578125 MB.
 
 
